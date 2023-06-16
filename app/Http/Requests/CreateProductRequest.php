@@ -25,7 +25,8 @@ class CreateProductRequest extends FormRequest
             "name" => "required|unique:products",
             "description" => "required",
             "price" => "required|numeric",
-            "file.*" => "nullable|image"
+            "file.*" => "nullable|image",
+            'category' => "required"
         ];
     }
 }

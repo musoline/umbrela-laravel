@@ -16,7 +16,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return Category::all();
+        $categories = Category::orderBy("created_at", "desc")->paginate(30);
+        return Inertia::render("Category/Category", ["categories" => $categories]);
     }
 
     /**
@@ -24,7 +25,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return Inertia::render("Admin/Category/CategoryCreate");
+        return Inertia::render("Category/CategoryCreate");
     }
 
     /**
@@ -33,7 +34,7 @@ class CategoryController extends Controller
     public function store(CreateCategoryRequest $request): RedirectResponse
     {
         Category::create($request->validated());
-        return redirect()->route("admin/dashboard");
+        return redirect()->route("admin");
     }
 
     /**

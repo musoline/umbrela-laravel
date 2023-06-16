@@ -6,8 +6,15 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link } from '@inertiajs/react';
 import React from 'react';
 
-export default function Authenticated({ user, header, children }) {
+export default function Authenticated({ user, header, children, createButton = <></> }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const isAdmin = (name: string, link: string) => {
+        return user.is_admin ? <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+            <NavLink href={route(`${link}`)} active={route().current(`${link}`)}>
+                {name}
+            </NavLink>
+        </div> : ""
+    }
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -27,22 +34,10 @@ export default function Authenticated({ user, header, children }) {
                                 </NavLink>
                             </div>
 
-                            <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <NavLink href={route('admin/dashboard')} active={route().current('admin/dashboard')}>
-                                    Admin
-                                </NavLink>
-                            </div>
+                            {isAdmin("admin", "admin")}
+                            {isAdmin("product", "product")}
+                            {isAdmin("category", "category")}
 
-                            <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <NavLink href={route('admin/product/create')} active={route().current('admin/product/create')}>
-                                    product
-                                </NavLink>
-                            </div>
-                            <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <NavLink href={route('admin/category/create')} active={route().current('admin/category/create')}>
-                                    category
-                                </NavLink>
-                            </div>
                         </div>
 
                         <div className="hidden sm:flex sm:items-center sm:ml-6">
@@ -133,10 +128,9 @@ export default function Authenticated({ user, header, children }) {
 
             {header && (
                 <header className="bg-white shadow">
-                    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
+                    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between">{header}{createButton}</div>
                 </header>
             )}
-
             <main>{children}</main>
         </div>
     );

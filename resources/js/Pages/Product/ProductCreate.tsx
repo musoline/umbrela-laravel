@@ -6,26 +6,40 @@ import React, { ChangeEvent } from 'react';
 import { FormEvent } from 'react';
 import { useState } from 'react';
 
-interface IRegisterFormState {
-    auth: any
-}
-
 interface IFormState {
     [key: string]: string | File[]
 }
 
-export default function ProductCreate({ auth }) {
+export default function ProductCreate({ auth, categories }) {
     const { errors } = usePage().props;
     const [form, setForm] = useState<IFormState>();
 
-    const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const key = event.target.id;
         const value = event.target.value;
+        console.log(value)
         setForm({
             ...form,
             [key]: value
         })
     }
+
+    const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
+        const key = event.target.id;
+        var options = event.target.options;
+        var value = [];
+        for (var i = 0, l = options.length; i < l; i++) {
+            if (options[i].selected) {
+                value.push(options[i].value);
+            }
+        }
+        console.log(value)
+        setForm({
+            ...form,
+            [key]: value
+        })
+    }
+
     const handleSubmitFile = (event: ChangeEvent<HTMLInputElement>) => {
         const key = event.target.id;
 
@@ -44,7 +58,20 @@ export default function ProductCreate({ auth }) {
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        router.post("product", form, { forceFormData: true })
+        router.post("/product", form, { forceFormData: true })
+    }
+
+    const imagesPreview = (els) => {
+        return els && els.map((photo) => {
+            const objectUrl = URL.createObjectURL(photo)
+            return <img src={objectUrl} key={photo.lastModified} className='h-40 p-5 m-5' />
+        })
+    }
+
+    const renderCats = (cats) => {
+
+        return cats && cats.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)
+
     }
 
     return <AuthenticatedLayout
@@ -54,6 +81,20 @@ export default function ProductCreate({ auth }) {
         <Head title="Product" />
         <div className='max-w-7xl mx-auto'>
             <form onSubmit={handleSubmit} className="max-w-xl mx-auto pt-12" encType='multipart/form-data'>
+
+                <div>
+                    <label htmlFor="category">Category</label>
+                    <select
+                        name="category"
+                        id="category"
+                        multiple={true}
+                        size={4}
+                        onChange={handleSelectChange}
+                        className='block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6'>
+                        {renderCats(categories)}
+                    </select>
+                </div>
+
                 <div>
                     <label htmlFor="name">Name</label>
                     <input className='block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00'
@@ -85,6 +126,7 @@ export default function ProductCreate({ auth }) {
                     />
                     <div className='text-xs' style={{ color: "red" }}>{errors.file}</div>
                 </div>
+                <div className='flex flex-wrap'>{imagesPreview(form?.file) || ""}</div>
                 <div>
                     <label htmlFor="name">Price</label>
                     <input className='block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00'

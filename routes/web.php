@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -27,33 +28,30 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, "index"])->middleware(['auth', 'verified'])->name('dashboard');
 
 
 
 
 Route::prefix("admin")->middleware(["auth", "verified", "isAdmin"])->group(function () {
-    route::get("/dashboard", function () {
+    route::get("/", function () {
         return Inertia::render("Admin/AdminPanel");
-    })->name("admin/dashboard");
-
-
-
-    Route::resource('product', ProductController::class)->only([
-        'index', 'store'
-    ]);
-    route::get("/product/create", [ProductController::class, "create"])->name("admin/product/create");
-
-
-    Route::resource("category", CategoryController::class)->only([
-        "index", "store"
-    ]);
-    route::get("/category/create", [CategoryController::class, "create"])->name("admin/category/create");
+    })->name("admin");
 });
 
+Route::resource('product', ProductController::class, [
+    "names" => [
+        "index" => "product",
+        "create" => "product/create"
+    ]
+])->middleware(["auth", "verified", "isAdmin"]);
 
+Route::resource("category", CategoryController::class, [
+    "names" => [
+        "index" => "category",
+        "create" => "category/create"
+    ]
+])->middleware(["auth", "verified", "isAdmin"]);
 
 
 Route::middleware('auth')->group(function () {
