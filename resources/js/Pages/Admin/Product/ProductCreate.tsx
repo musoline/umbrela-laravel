@@ -11,10 +11,10 @@ interface IRegisterFormState {
 }
 
 interface IFormState {
-    [key: string]: string
+    [key: string]: string | File[]
 }
 
-export default function Create({ auth }) {
+export default function ProductCreate({ auth }) {
     const { errors } = usePage().props;
     const [form, setForm] = useState<IFormState>();
 
@@ -25,11 +25,26 @@ export default function Create({ auth }) {
             ...form,
             [key]: value
         })
-        console.log(form)
     }
+    const handleSubmitFile = (event: ChangeEvent<HTMLInputElement>) => {
+        const key = event.target.id;
+
+        const value = []
+
+        for (let i = 0; i < event.target.files.length; i++) {
+            value.push(event.target.files[i])
+        }
+
+        setForm({
+            ...form,
+            [key]: value
+        })
+    }
+
+
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        router.post("product", form)
+        router.post("product", form, { forceFormData: true })
     }
 
     return <AuthenticatedLayout
@@ -38,13 +53,13 @@ export default function Create({ auth }) {
     >
         <Head title="Product" />
         <div className='max-w-7xl mx-auto'>
-            <form onSubmit={handleSubmit} className="max-w-xl mx-auto pt-12">
+            <form onSubmit={handleSubmit} className="max-w-xl mx-auto pt-12" encType='multipart/form-data'>
                 <div>
                     <label htmlFor="name">Name</label>
                     <input className='block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00'
                         id='name'
                         name='name'
-                        value={form?.name || ''}
+                        value={form?.name as string || ''}
                         onChange={handleChange}
                     />
                     <div className='text-xs' style={{ color: "red" }}>{errors.name}</div>
@@ -54,16 +69,28 @@ export default function Create({ auth }) {
                     <textarea className='block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00'
                         id='description'
                         onChange={handleChange}
-                    >{form?.description}</textarea>
+                    >{form?.description as string}</textarea>
                     <div className='text-xs' style={{ color: "red" }}>{errors.description}</div>
 
+                </div>
+                <div>
+                    <label htmlFor="name">file</label>
+                    <input className='block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00'
+                        id='file'
+                        type="file"
+                        multiple
+                        name='file'
+                        value={""}
+                        onChange={handleSubmitFile}
+                    />
+                    <div className='text-xs' style={{ color: "red" }}>{errors.file}</div>
                 </div>
                 <div>
                     <label htmlFor="name">Price</label>
                     <input className='block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00'
                         id='price'
                         name='price'
-                        value={form?.price || ''}
+                        value={form?.price as string || ''}
                         onChange={handleChange}
                     />
                     <div className='text-xs' style={{ color: "red" }}>{errors.price}</div>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -38,11 +39,17 @@ Route::prefix("admin")->middleware(["auth", "verified", "isAdmin"])->group(funct
         return Inertia::render("Admin/AdminPanel");
     })->name("admin/dashboard");
 
-    route::get("/product/created", function () {
-        return Inertia::render("Admin/Product/Created");
-    })->name("admin/product/created");
-    route::get("/product", [ProductController::class, "create"])->name("admin/product");
-    route::post("/product", [ProductController::class, "store"]);
+
+    route::prefix("product")->group(function () {
+        route::get("/", [ProductController::class, "create"])->name("admin/product");
+        route::post("/", [ProductController::class, "store"]);
+    });
+
+
+    route::prefix("category")->group(function () {
+        route::get("/", [CategoryController::class, "create"])->name("admin/category");
+        route::post("/", [CategoryController::class, "store"]);
+    });
 });
 
 

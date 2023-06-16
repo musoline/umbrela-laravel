@@ -25,7 +25,7 @@ class ProductController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render("Admin/Product/Create");
+        return Inertia::render("Admin/Product/ProductCreate");
     }
 
     /**
@@ -35,9 +35,15 @@ class ProductController extends Controller
     {
 
 
-        Product::create($request->validated());
 
-        return redirect()->route("admin/product/created");
+        $product = Product::create($request->validated());
+
+        foreach ($request->file as $image) {
+            $name = $image->getClientOriginalName();
+            $image->move(public_path() . '/uploads/', $name);
+            $product->productImages()->create(["src" => $name]);
+        }
+        return redirect()->route("admin/dashboard");
     }
 
     /**
