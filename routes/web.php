@@ -40,16 +40,17 @@ Route::prefix("admin")->middleware(["auth", "verified", "isAdmin"])->group(funct
     })->name("admin/dashboard");
 
 
-    route::prefix("product")->group(function () {
-        route::get("/", [ProductController::class, "create"])->name("admin/product");
-        route::post("/", [ProductController::class, "store"]);
-    });
+
+    Route::resource('product', ProductController::class)->only([
+        'index', 'store'
+    ]);
+    route::get("/product/create", [ProductController::class, "create"])->name("admin/product/create");
 
 
-    route::prefix("category")->group(function () {
-        route::get("/", [CategoryController::class, "create"])->name("admin/category");
-        route::post("/", [CategoryController::class, "store"]);
-    });
+    Route::resource("category", CategoryController::class)->only([
+        "index", "store"
+    ]);
+    route::get("/category/create", [CategoryController::class, "create"])->name("admin/category/create");
 });
 
 
